@@ -48,7 +48,7 @@ like::
 $Id: stringparse.py 1696 2009-02-08 08:22:06Z jens $
 """
 
-from cStringIO import StringIO
+from io import StringIO
 import tokenize
 
 class ParserSyntaxError(SyntaxError):
@@ -137,10 +137,10 @@ def parse_string(s, start, end):
     Parses a string literal to its true form
     """
     unquote = True
-    unicode = False
+    str = False
     if s.startswith('u'):
         s = s[1:]
-        unicode = True
+        str = True
     if s.startswith('"""') or s.startswith("'''"):
         s = s[3:-3]
     elif s.startswith("'") or s.startswith('"'):
@@ -155,7 +155,7 @@ def parse_string(s, start, end):
         raise ParserSyntaxError("Unknown string format: %s" % s, start, end)
     if unquote:
         s = s.decode('string_escape')
-    if unicode:
+    if str:
         ## FIXME: what encoding would it be?
         s = s.decode('unicode_escape')
     return s

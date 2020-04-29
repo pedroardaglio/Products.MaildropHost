@@ -58,9 +58,9 @@ class MaildropHostTests(unittest.TestCase):
 
     def test_instantiation(self):
         mdh = self._makeOne('MDH', 'MDH Title')
-        self.assertEquals(mdh.getId(), 'MDH')
-        self.assertEquals(mdh.title, 'MDH Title')
-        self.assertEquals(mdh.isTransactional(), True)
+        self.assertEqual(mdh.getId(), 'MDH')
+        self.assertEqual(mdh.title, 'MDH Title')
+        self.assertEqual(mdh.isTransactional(), True)
 
     def test_edit(self):
         mdh = self._makeOne('MDH', 'MDH Title')
@@ -71,9 +71,9 @@ class MaildropHostTests(unittest.TestCase):
         mdh.manage_makeChanges( 'New Title'
                               , transactional=False
                               )
-        self.assertEquals(mdh.title, 'New Title')
-        self.assertEquals(mdh.isTransactional(), False)
-        self.assertEquals(mdh.getConfigPath(), config_path)
+        self.assertEqual(mdh.title, 'New Title')
+        self.assertEqual(mdh.isTransactional(), False)
+        self.assertEqual(mdh.getConfigPath(), config_path)
 
         # Now set a different configuration path
         from Products.MaildropHost.MaildropHost import CONFIG_PATHS
@@ -91,7 +91,7 @@ class MaildropHostTests(unittest.TestCase):
 
         # Make sure the default key exists
         candidates = mdh.getCandidateConfigPaths()
-        self.failUnless('DEFAULT' in [x[0] for x in candidates])
+        self.assertTrue('DEFAULT' in [x[0] for x in candidates])
 
     def test_config_paths_set_unknown(self):
         mdh = self._makeOne('MDH', 'MDH Title')
@@ -99,7 +99,7 @@ class MaildropHostTests(unittest.TestCase):
 
         # Must blow up if an invalid key is passed, config unchanged
         self.assertRaises(ValueError, mdh.setConfigPath, 'unknown')
-        self.assertEquals(old_config, mdh.getConfigPath())
+        self.assertEqual(old_config, mdh.getConfigPath())
 
     def test_config_paths_set_invalid(self):
         from Products.MaildropHost.MaildropHost import CONFIG_PATHS
@@ -110,7 +110,7 @@ class MaildropHostTests(unittest.TestCase):
 
         # Must blow up since the file does not exist, config unchanged
         self.assertRaises(ValueError, mdh.setConfigPath, 'invalid')
-        self.assertEquals(old_config, mdh.getConfigPath())
+        self.assertEqual(old_config, mdh.getConfigPath())
 
         # cleanup
         CONFIG_PATHS = old_config_paths
@@ -125,7 +125,7 @@ class MaildropHostTests(unittest.TestCase):
 
         # Must blow up since the file does not exist
         self.assertRaises(RuntimeError, mdh.setConfigPath, 'bad')
-        self.assertEquals(old_config, mdh.getConfigPath())
+        self.assertEqual(old_config, mdh.getConfigPath())
 
         # cleanup
         CONFIG_PATHS = old_config_paths
@@ -140,9 +140,9 @@ class MaildropHostTests(unittest.TestCase):
 
         # This must work, and the settings must stick
         mdh.setConfigPath('good')
-        self.assertEquals(good_config_path, mdh.getConfigPath())
-        self.assertNotEquals(old_smtp_host, mdh.smtp_host)
-        self.assertEquals(mdh.smtp_host, 'this.is.a.test')
+        self.assertEqual(good_config_path, mdh.getConfigPath())
+        self.assertNotEqual(old_smtp_host, mdh.smtp_host)
+        self.assertEqual(mdh.smtp_host, 'this.is.a.test')
 
         # cleanup
         CONFIG_PATHS = old_config_paths
@@ -160,15 +160,15 @@ class MaildropHostTests(unittest.TestCase):
 
         # This must work, and the settings must stick
         mdh.setConfigPath('good')
-        self.assertEquals(new_config_path, mdh.getConfigPath())
-        self.assertEquals(mdh.smtp_host, 'this.is.a.test')
+        self.assertEqual(new_config_path, mdh.getConfigPath())
+        self.assertEqual(mdh.smtp_host, 'this.is.a.test')
 
         # Now we delete the file and manually call up _load_config
         os.unlink(new_config_path)
 
         # If the config file is not found, the default config file is loaded.
         mdh._load_config()
-        self.assertEquals(mdh.smtp_host, old_smtp_host)
+        self.assertEqual(mdh.smtp_host, old_smtp_host)
 
         # cleanup
         CONFIG_PATHS = old_config_paths
@@ -183,9 +183,9 @@ class MaildropHostTests(unittest.TestCase):
         config_path = '/a/system/path'
         mdh.addConfigPath('program_path', config_path)
         candidates = mdh.getCandidateConfigPaths()
-        self.assertEquals(len(candidates), num_current_paths + 1)
-        self.failUnless('program_path' in [x[0] for x in candidates])
-        self.assertEquals(CONFIG_PATHS['program_path'], config_path)
+        self.assertEqual(len(candidates), num_current_paths + 1)
+        self.assertTrue('program_path' in [x[0] for x in candidates])
+        self.assertEqual(CONFIG_PATHS['program_path'], config_path)
 
         # cleanup
         CONFIG_PATHS = old_config_paths

@@ -22,8 +22,8 @@ import os
 import rfc822
 import signal
 import smtplib
-from stringparse import parse_assignments
-from stringparse import ParserSyntaxError
+from .stringparse import parse_assignments
+from .stringparse import ParserSyntaxError
 import sys
 import time
 
@@ -31,7 +31,7 @@ FATAL_ERROR_CODES = ('500', '501', '502', '503', '504', '550', '551', '553')
 MaildropError = 'Maildrop Error'
 
 def usage():
-    print 'Usage: maildrop.py /path/to/config'
+    print('Usage: maildrop.py /path/to/config')
 
 
 def mainloop():                   
@@ -60,7 +60,7 @@ def mainloop():
             log_file = open(MAILDROP_LOG_FILE, 'a')
             msg = '\n### Started at %s...' % time_stamp
             log_file.write(msg)
-            if DEBUG: print msg
+            if DEBUG: print(msg)
     
             while len(to_be_sent) > 0:
                 if (MAILDROP_BATCH == 0) or (MAILDROP_BATCH > len(to_be_sent)):
@@ -79,9 +79,9 @@ def mainloop():
                     err_msg = '!!!!! Connection error at %s' % time_stamp
                     finish_msg = '### Finished at %s' % time_stamp
                     log_file.write(err_msg)
-                    if DEBUG: print err_msg
+                    if DEBUG: print(err_msg)
                     log_file.write(finish_msg)
-                    if DEBUG: print finish_msg
+                    if DEBUG: print(finish_msg)
                     break
     
                 if MAILDROP_TLS > 0:
@@ -93,9 +93,9 @@ def mainloop():
                         err_msg = '!!!!! TLS unavailable at %s' % time_stamp
                         finish_msg = '### Finished at %s' % time_stamp
                         log_file.write(err_msg)
-                        if DEBUG: print err_msg
+                        if DEBUG: print(err_msg)
                         log_file.write(finish_msg)
-                        if DEBUG: print finish_msg
+                        if DEBUG: print(finish_msg)
                         break
     
                     smtp_server.starttls()
@@ -112,9 +112,9 @@ def mainloop():
                         err_msg = '!!!!! Authentication unavailable at %s' % time_stamp
                         finish_msg = '### Finished at %s' % time_stamp
                         log_file.write(err_msg)
-                        if DEBUG: print err_msg
+                        if DEBUG: print(err_msg)
                         log_file.write(finish_msg)
-                        if DEBUG: print finish_msg
+                        if DEBUG: print(finish_msg)
                         break
     
                     try:
@@ -126,9 +126,9 @@ def mainloop():
                         err_msg = '!!!!! Authentication failed at %s' % time_stamp
                         finish_msg = '### Finished at %s' % time_stamp
                         log_file.write(err_msg)
-                        if DEBUG: print err_msg
+                        if DEBUG: print(err_msg)
                         log_file.write(finish_msg)
-                        if DEBUG: print finish_msg
+                        if DEBUG: print(finish_msg)
                         break
     
                 for file_path in to_be_sent[0:batch]:
@@ -151,18 +151,18 @@ def mainloop():
                         smtp_server.sendmail(h_from, h_to_list, h_body)
                         stat = 'OK'
                         os.remove(file_path)
-                    except smtplib.SMTPRecipientsRefused, e:
+                    except smtplib.SMTPRecipientsRefused as e:
                         stat = 'FATAL: ', str(e)
-                        for (addr, error) in e.recipients.items():
+                        for (addr, error) in list(e.recipients.items()):
                              if str(error[0]) in FATAL_ERROR_CODES:
                                  os.remove(file_path)
                                  break
-                    except smtplib.SMTPException, e:
+                    except smtplib.SMTPException as e:
                         stat = 'BAD: ', str(e)
     
                     mail_msg = '\n%s\t %s' % (stat, h_to)
                     log_file.write(mail_msg)
-                    if DEBUG: print mail_msg
+                    if DEBUG: print(mail_msg)
                     log_file.flush()
                     if WAIT_INTERVAL:
                         time.sleep(WAIT_INTERVAL)
@@ -177,7 +177,7 @@ def mainloop():
             time_stamp = time.strftime('%Y/%m/%d %H:%M:%S')
             finish_msg = '\n### Finished at %s\n' % time_stamp
             log_file.write(finish_msg)
-            if DEBUG: print finish_msg
+            if DEBUG: print(finish_msg)
             log_file.close()
             
         time.sleep(MAILDROP_INTERVAL)
@@ -242,12 +242,12 @@ if __name__ == "__main__":
         try:
             c_file = open(sys.argv[1])
         except IOError:
-            raise MaildropError, 'Cannot find config file "%s"' % c_file
+            raise MaildropError('Cannot find config file "%s"' % c_file)
 
         try:
             config = dict(parse_assignments(c_file.read()))
         except ParserSyntaxError:
-            raise MaildropError, 'Cannot load config from "%s"' % c_file
+            raise MaildropError('Cannot load config from "%s"' % c_file)
     
         MAILDROP_HOME = config['MAILDROP_HOME']
         MAILDROP_INTERVAL = config['MAILDROP_INTERVAL']
@@ -303,16 +303,16 @@ if __name__ == "__main__":
         except:
             if DEBUG: import traceback; traceback.print_exc()
             msg = 'Invalid SMTP server "%s:%d"' % (SMTP_HOST, SMTP_PORT)
-            raise MaildropError, msg
+            raise MaildropError(msg)
 
     except SystemExit: 
         sys.exit(0)
     except:
         usage()
-        print 
-        print 'An error occured, aborting...'
-        print "%s: %s" % (sys.exc_type, sys.exc_value)
-        print
+        print() 
+        print('An error occured, aborting...')
+        print("%s: %s" % (sys.exc_info()[0], sys.exc_info()[1]))
+        print()
         sys.exit(1)
     
     if not (DEBUG or SUPERVISED_DAEMON):
@@ -324,9 +324,9 @@ if __name__ == "__main__":
             if pid > 0:
                 # Exit first parent
                 sys.exit(0)
-        except OSError, e:
-            print >>sys.stderr, "fork #1 failed: %d (%s)" % (
-                e.errno, e.strerror)
+        except OSError as e:
+            print("fork #1 failed: %d (%s)" % (
+                e.errno, e.strerror), file=sys.stderr)
             sys.exit(1)
 
         # Decouple from parent environment
@@ -340,18 +340,18 @@ if __name__ == "__main__":
             if pid > 0:
                 # Exit from second parent; print eventual PID before exiting
                 if DEBUG:
-                    print "maildrop daemon PID %d" % pid
+                    print("maildrop daemon PID %d" % pid)
                 write_pid(MAILDROP_PID_FILE, pid)
                 sys.exit(0)
-        except OSError, e:
-            print >>sys.stderr, "fork #2 failed: %d (%s)" % (
-                e.errno, e.strerror)
+        except OSError as e:
+            print("fork #2 failed: %d (%s)" % (
+                e.errno, e.strerror), file=sys.stderr)
             sys.exit(1)
         atexit.register(exit_function,MAILDROP_PID_FILE)
         signal.signal(signal.SIGTERM,handle_sigterm)
     elif DEBUG:
-        print '*****          Starting in DEBUG mode           *****'
-        print '***** All log messages are shown on the console *****'
+        print('*****          Starting in DEBUG mode           *****')
+        print('***** All log messages are shown on the console *****')
         sys.stdout.flush()
 
     # Start the daemon main loop

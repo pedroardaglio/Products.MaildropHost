@@ -31,7 +31,7 @@ class TransactionalMixin:
     def _register(self):
         global transactions
         t = transaction.get()
-        if transactions.has_key(t):
+        if t in transactions:
             et = transactions[t]
         else:
             et = EmailTransaction()
@@ -104,7 +104,7 @@ class SavePoint:
             self.et._savepoint = self
         else:
             self.previous=None
-        if self.next is not None:
+        if self.__next__ is not None:
             self.next.rollback(False)
         self.next=None
             
@@ -129,7 +129,7 @@ class EmailTransaction:
         global transactions
         self._savepoint.abort()
         # NB: abort can get called more than once
-        if transactions.has_key(t):
+        if t in transactions:
             # paranoia
             assert transactions[t] is self
             # transaction over

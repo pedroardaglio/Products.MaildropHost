@@ -20,7 +20,7 @@ import os
 from random import randint
 from types import StringType
 from types import UnicodeType
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 # Zope imports
 from AccessControl import ClassSecurityInfo
@@ -43,7 +43,7 @@ DEFAULT_CONFIG_PATH = os.path.join(package_home(globals()), 'config')
 
 config = getattr(getConfiguration(),'product_config',{}).get('maildrophost', {})
 CONFIG_PATHS = {'DEFAULT' : DEFAULT_CONFIG_PATH}
-for key, value in config.items():
+for key, value in list(config.items()):
     if key.startswith('config-path'):
         CONFIG_PATHS[key] = value
 
@@ -54,7 +54,7 @@ def manage_addMaildropHost(self, id, title='Maildrop Host', REQUEST=None):
     self._setObject(id, mh)
 
     if REQUEST is not None:
-        qs = 'manage_tabs_message=%s' % urllib.quote('Added MaildropHost.')
+        qs = 'manage_tabs_message=%s' % urllib.parse.quote('Added MaildropHost.')
         ret_url = '%s/%s/manage_main?%s' % (self.absolute_url(), id, qs)
         REQUEST['RESPONSE'].redirect(ret_url)
 
@@ -141,7 +141,7 @@ class MaildropHost(MailHost):
     def getCandidateConfigPaths(self):
         """ Retrieve the config paths set in zope.conf
         """
-        path_keys = CONFIG_PATHS.keys()
+        path_keys = list(CONFIG_PATHS.keys())
         path_keys.sort()
         return tuple([(x, CONFIG_PATHS.get(x)) for x in path_keys])
 
