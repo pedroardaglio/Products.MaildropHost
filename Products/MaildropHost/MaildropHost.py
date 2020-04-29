@@ -18,8 +18,6 @@ $Id: MaildropHost.py 1815 2009-10-09 21:14:55Z jens $
 # General python imports
 import os
 from random import randint
-from types import StringType
-from types import UnicodeType
 import urllib.request, urllib.parse, urllib.error
 
 # Zope imports
@@ -27,16 +25,16 @@ from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import change_configuration
 from Acquisition import aq_base
 from App.config import getConfiguration
-from Globals import DTMLFile
-from Globals import InitializeClass
-from Globals import package_home
+from App.special_dtml import DTMLFile
+from AccessControl.class_init import InitializeClass
+from App.Common import package_home
 from Products.MailHost.interfaces import IMailHost
 from Products.MailHost.MailHost import MailHost
-from zope.interface import implements
+from zope.interface import implementer
 
 # MaildropHost package imports
-from Products.MaildropHost.maildrop.stringparse import parse_assignments
-from Products.MaildropHost.TransactionalMixin import TransactionalMixin
+from .maildrop.stringparse import parse_assignments
+from .TransactionalMixin import TransactionalMixin
 
 _globals = globals()
 DEFAULT_CONFIG_PATH = os.path.join(package_home(globals()), 'config')
@@ -67,13 +65,11 @@ def _makeTempPath(spool_path):
         temp_path = os.path.join(spool_path, str(randint(100000, 9999999)))
 
     return temp_path
-    
 
+
+@implementer(IMailHost)
 class MaildropHost(MailHost):
     """ A MaildropHost """
-
-    implements(IMailHost)
-
     security = ClassSecurityInfo()
     meta_type = 'Maildrop Host'
     manage = manage_main = DTMLFile('dtml/edit', globals())
@@ -251,7 +247,7 @@ class Email:
 
     def __init__(self, mfrom, mto, body, temp_path):
         """ Instantiate a new email object """
-        if not (isinstance(mto, StringType) or isinstance(mto, UnicodeType)):
+        if isinstance(mto, str):
             self.m_to = ','.join(mto).replace('\r', '').replace('\n', '')
         else:
             self.m_to = mto.replace('\r', '').replace('\n', '')

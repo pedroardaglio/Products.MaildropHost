@@ -154,10 +154,10 @@ def parse_string(s, start, end):
     else:
         raise ParserSyntaxError("Unknown string format: %s" % s, start, end)
     if unquote:
-        s = s.decode('string_escape')
+        s = s  # .decode('string_escape')
     if str:
         ## FIXME: what encoding would it be?
-        s = s.decode('unicode_escape')
+        s = s  # .decode('unicode_escape')
     return s
 
 if __name__ == '__main__':
