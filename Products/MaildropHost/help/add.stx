@@ -1,0 +1,12 @@
+MaildropHost - Add: Create a new MaildropHost
+
+  Description
+
+    Create a new MaildropHost object.
+
+  Controls
+
+    'Id' -- The id of the MaildropHost object.
+
+    'Title' -- The title of the MaildropHost.
+

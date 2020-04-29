@@ -1,0 +1,74 @@
+#!/bin/sh
+# Startup script for the maildrop daemon using start_maildrop
+# by Jens Vagelpohl (jens@dataflake.org)
+#
+# chkconfig: 2345 80 20
+# description: maildrop transports email for the MaildropHost Zope product
+
+############################################################
+# EDIT HERE
+############################################################
+
+# MAILDROP_USER is the system account used to run the 
+# maildrop daemon. It must have read/write access to the
+# spool directory inside the MAILDROP_HOME directory
+# defined in the config file
+MAILDROP_USER="zope"
+
+# SOFTWARE_HOME points to the toplevel directory of the
+# MaildropHost Zope product. It contains the configuration
+# file config.
+SOFTWARE_HOME="/home/zope/opt/MaildropHost-HEAD"
+
+############################################################
+# DO NOT EDIT BELOW THIS LINE
+############################################################
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+name="maildrop"
+
+[ -f "$SOFTWARE_HOME/config" ] || exit 1
+
+RETVAL=0
+
+start() {
+    echo -n $"Starting $name: " 
+    daemon --user=$MAILDROP_USER $SOFTWARE_HOME/maildrop/bin/start_maildrop
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && touch "/var/lock/subsys/$name"
+    echo
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping $name: " 
+    $SOFTWARE_HOME/maildrop/bin/stop_maildrop
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f "/var/lock/subsys/$name"
+    echo
+    return $RETVAL
+}
+
+case "$1" in
+        start)
+            start
+            ;;
+        
+        stop)
+            stop
+            ;;
+        
+        restart)
+            stop
+            start
+            ;;
+        
+        *)
+            echo $"Usage: $0 {start|stop|restart}"
+            exit 1
+
+esac
+
+exit $RETVAL

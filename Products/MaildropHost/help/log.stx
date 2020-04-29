@@ -1,0 +1,12 @@
+MaildropHost - Maildrop Log: View the maildrop daemon log
+  
+  Description
+
+    This view allows you view the log file created by the maildrop 
+    daemon process.
+
+ Controls
+
+    'Log Entries' -- The log file contents and the file path where the
+      log is written.
+

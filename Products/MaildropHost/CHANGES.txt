@@ -1,0 +1,65 @@
+MaildropHost change log
+=======================
+
+2.3 (2009-10-09)
+----------------
+
+- Feature: Added a method for extending the list of configuration
+  file paths programatically.
+  (http://www.dataflake.org/tracker/issue_00649)
+
+
+2.2 (2009-05-29)
+----------------
+
+- Bug: If a configuration file path has been set, but the file is 
+  removed later, Zope would no longer start up as the 
+  MaildropHost code attempts to load the file but fails. Now it
+  will fall back to the default file path in this case.
+  (http://www.dataflake.org/tracker/issue_00642)
+
+- Bug: Replace file paths pointing to config.py as opposed to 
+  the new config in stop_maildrop and testing/start_maildrop
+  (http://www.dataflake.org/tracker/issue_00641)
+
+- Remove a few extraneous log file close calls in maildrop.py
+  (http://www.dataflake.org/tracker/issue_00636)
+
+- fix testing to detect Zope trunk
+
+
+2.1 (2008-11-03)
+----------------
+
+- compatibility work for Zope 2.11
+
+
+2.0 (2008-11-01)
+----------------
+
+- Switch to releasing MaildropHost as egg
+
+- clean up Python module preambles based on the standard set by Zope
+  itself.
+
+- clean up Subversion keyword tagging to use the Id tag all over
+
+- major test refactoring and simplifications
+
+- The MaildropHost class is now marked to implement IMailHost, just
+  like the standard Zope 2 MailHost.
+
+- The configuration file for each MaildropHost instance can now be selected 
+  in the ZMI on the 'Edit' tab. By default, the dropdown will show the file
+  'config' in the MaildropHost directory. The site administrator can add
+  more paths using the Zope instance configuration file zope.conf. Please 
+  see README.txt to find out how.
+
+- cleaned up the help system content and use the name "MaildropHost" as 
+  opposed to "Maildrop Host" wherever possible.
+
+
+Previous releases
+-----------------
+
+See HISTORY.txt

@@ -1,0 +1,4 @@
+
+      [zope2.initialize]
+      Products.MaildropHost = Products.MaildropHost:initialize
+      

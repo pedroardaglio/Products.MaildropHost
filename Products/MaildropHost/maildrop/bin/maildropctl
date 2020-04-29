@@ -1,0 +1,123 @@
+#!/bin/sh
+##
+## Based (!) on apachectl
+##
+## When multiple arguments are given, only the error from the _last_
+## one is reported.  Run "maildropctl help" for usage info
+##
+
+
+############################################################
+## Constants
+############
+## Configuration and daemon script location
+MAILDROP_DIR="/home/zope/maildrop/"
+
+## Configuration file
+MAILDROP_CONFIG_FILE="$MAILDROP_DIR/config"
+
+## User which will control the daemon process
+MAILDROP_USER="zope"
+
+############################################################
+
+
+## Initialize
+ARGV="$@"
+ERROR=0
+if [ "x$ARGV" = "x" ] ; then 
+    ARGV="-h"
+fi
+
+## Current user
+CURRENT_USER=`id -un`
+
+## Source configuration file
+. $MAILDROP_CONFIG_FILE
+
+## Where is the pid file?
+if [ -z "$MAILDROP_VAR" ]
+then
+    MAILDROP_VAR=$MAILDROP_HOME/var
+fi
+
+if [ -z "$MAILDROP_PID_FILE" ]
+then
+    MAILDROP_PID_FILE=$MAILDROP_VAR/maildrop.pid
+fi
+
+## Start and stop Commands
+START_CMD="$PYTHON $MAILDROP_DIR/maildrop.py $MAILDROP_CONFIG_FILE"
+
+start()
+{
+  if [ "$CURRENT_USER" = "$MAILDROP_USER" ]
+  then
+    $START_CMD &
+  else
+    su $MAILDROP_USER -c "$START_CMD" &
+  fi
+}
+
+stop()
+{
+  STOP_CMD1="kill `cat $MAILDROP_PID_FILE`"
+  STOP_CMD2="rm -f $MAILDROP_PID_FILE"
+
+  if [ "$CURRENT_USER" = "$MAILDROP_USER" ]
+  then
+    $STOP_CMD1
+    $STOP_CMD2
+  else
+    su $MAILDROP_USER -c "$STOP_CMD1"
+    su $MAILDROP_USER -c "$STOP_CMD2"
+  fi
+}
+
+case $ARGV in
+stop)
+    if [ -f $MAILDROP_PID_FILE ]
+    then
+        stop
+        ERROR=$?
+    else
+        echo "Error: maildrop daemon already stopped."
+        ERROR=1
+    fi
+    ;;
+
+start)
+    if [ -f $MAILDROP_PID_FILE ]
+    then
+        kill -0 `cat $MAILDROP_PID_FILE` 2> /dev/null
+        if [ "$?" == "0" ] 
+        then
+            echo "Error: maildrop daemon already started."
+            ERROR=1
+        else
+            echo 'Warning: maildrop daemon not found. Removing PID file'
+            rm -f $MAILDROP_PID_FILE
+            start
+            ERROR=$?
+        fi
+    else
+        start
+        ERROR=$?
+    fi
+    ;;
+
+restart)
+    if [ -f $MAILDROP_PID_FILE ]
+    then
+      stop
+    fi
+    start
+    ERROR=$?
+    ;;
+
+*)
+    echo "Syntax: maildropd start|stop|restart"
+    ERROR=$?
+esac
+
+exit $ERROR

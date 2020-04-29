@@ -1,0 +1,21 @@
+MaildropHost - Edit: Edit MaildropHost properties
+  
+  Description
+
+    This view allows you edit the MaildropHost.
+
+ Controls
+
+    'Id' -- The id of the MaildropHost.
+
+    'Title' -- The title of the MaildropHost.
+
+    'Transactional Mode' -- Toggle the Zope transaction-aware mode
+
+    'Configuration file path' -- Select the filesystem path to the 
+      MaildropHost configuration file here. See README.txt to find
+      out how to add more choices to this select list.
+
+    'Maildrop Daemon settings' -- The settings shown in this table
+      are read from the MaildropHost configuration file selected
+      above. They are used by the maildrop daemon.

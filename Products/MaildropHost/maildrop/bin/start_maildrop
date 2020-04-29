@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#
+#   Start script to run the maildrop python process
+#
+reldir=`dirname $0`
+
+if [ $reldir = "." ]; then
+    reldir=`pwd`;
+fi
+
+# The maildrop.py module is one level back up, so find the parent
+MAILDROPHOME=`dirname $reldir`
+
+# The configuration file is one level up in the MaildropHost package
+parent=`dirname $MAILDROPHOME`
+CONFIG="$parent/config"
+
+# Get the configuration (esp. $PYTHON)
+. $CONFIG
+
+exec $PYTHON $MAILDROPHOME/maildrop.py "$CONFIG"

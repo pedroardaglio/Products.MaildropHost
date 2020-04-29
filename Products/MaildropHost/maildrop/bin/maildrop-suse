@@ -1,0 +1,63 @@
+#! /bin/sh
+#
+# Author: Jens Vagelpohl
+#
+#
+### BEGIN INIT INFO
+# Provides:        maildrop
+# Required-Start:  $remote_fs
+# X-UnitedLinux-Should-Start:
+# Required-Stop:   $remote_fs
+# Default-Start:   2 3 5
+# Default-Stop:    0 1 6
+# Description:    maildrop daemon start/stop script
+### END INIT INFO
+
+############################################################
+# EDIT HERE
+############################################################
+
+# MAILDROP_USER is the system account used to run the
+# maildrop daemon. It must have read/write access to the
+# spool directory inside the MAILDROP_HOME directory
+# defined in the config file
+MAILDROP_USER="zope"
+
+# SOFTWARE_HOME points to the toplevel directory of the
+# MaildropHost Zope product. It contains the configuration
+# file config.
+SOFTWARE_HOME="/home/zope/opt/MaildropHost-HEAD"
+
+############################################################
+# DO NOT EDIT BELOW THIS LINE
+############################################################
+
+name=Maildrop
+conf="$SOFTWARE_HOME/config"
+test -f $conf || exit 5
+
+. /etc/rc.status
+rc_reset
+
+case "$1" in
+    start)
+        echo -n "Starting $name "
+        su - $MAILDROP_USER -c "$SOFTWARE_HOME/maildrop/bin/start_maildrop $conf"
+        rc_status -v
+    ;;
+    stop)
+        echo -n "Shutting down $name "
+        "$SOFTWARE_HOME/maildrop/bin/stop_maildrop"
+        rc_status -v
+        ;;
+    restart)
+        $0 stop
+        $0 start
+        rc_status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+rc_exit

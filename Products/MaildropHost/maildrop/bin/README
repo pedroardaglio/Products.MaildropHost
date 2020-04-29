@@ -1,0 +1,66 @@
+Start/Stop scripts for the standalone maildrop daemon
+=====================================================
+
+This README explains what the files in this folder do and how to use
+them.  All these scripts depend on you having edited the config file
+in the toplevel MaildropHost folder to reflect your
+environment. 
+
+Please note: Some of them require additional editing before use! If you
+use several maildrop daemons with different configurations, make sure 
+to adjust the configuration file path for each daemon startup script.
+
+start_maildrop
+
+  Basic start script to start up the maildrop daemon. All configuration
+  is taken from the config file, no additional editing needed.
+
+stop_maildrop
+
+  Basic stop script to stop the maildrop daemon. No additional editing
+  needed.
+
+start_maildrop.bat
+
+  Startup script suitable for Windows. Its correctness or working order
+  cannot be guaranteed since I do not use Windows.
+
+maildrop-redhat
+
+  Combined start/stop script that interoperates with the RedHat way of
+  controlling services and daemons. This script *needs editing* at the 
+  top so it knows where to locate the maildrop files when run at 
+  startup and it knows what user account to run under.
+
+  Edit the MAILDROP_USER and SOFTWARE_HOME values at the top of the script.
+  Then all you need to do is copy or link it into /etc/rc.d/init.d and 
+  ensure that it gets run on system start/system shutdown by using 
+  the chkconfig utility, like so::
+
+    $ /sbin/chkconfig --add maildrop-redhat
+
+  This will take care of all activation. You can, as root, use this::
+
+    $ /sbin/service maildrop-redhat {start|stop|restart}
+
+  to control the service.
+
+maildrop-suse
+
+  Combined start/stop script that interoperates with the SuSE way of
+  controlling services and daemons. This script *needs editing* at the 
+  top so it knows where to locate the maildrop files when run at 
+  startup and it knows what user account to run under.
+
+  Edit the MAILDROP_USER and SOFTWARE_HOME values at the top of the script.
+  Then all you need to do is copy or link it into /etc/rc.d and 
+  ensure that it gets run on system start/system shutdown by using 
+  the chkconfig utility, like so::
+
+    $ /sbin/chkconfig --add maildrop-suse
+
+  This will take care of all activation. You can, as root, use this::
+
+    $ /etc/rc.d/maildrop-suse {start|stop|restart}
+
+  to control the service.
