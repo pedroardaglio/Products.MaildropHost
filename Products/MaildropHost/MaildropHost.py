@@ -247,7 +247,7 @@ class Email:
 
     def __init__(self, mfrom, mto, body, temp_path):
         """ Instantiate a new email object """
-        if isinstance(mto, str):
+        if not isinstance(mto, str):
             self.m_to = ','.join(mto).replace('\r', '').replace('\n', '')
         else:
             self.m_to = mto.replace('\r', '').replace('\n', '')
