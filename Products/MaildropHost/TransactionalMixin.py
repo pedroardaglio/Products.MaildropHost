@@ -166,7 +166,7 @@ class EmailTransaction:
             needs to have a known commit order for lock acquisition.
             I don't care about commit order, so return the constant 1
         """
-        return 1
+        return '1'
 
     def savepoint(self):
         """Return a data-manager savepoint (IDataManagerSavepoint).
