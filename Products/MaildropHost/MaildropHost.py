@@ -18,7 +18,9 @@ $Id: MaildropHost.py 1815 2009-10-09 21:14:55Z jens $
 # General python imports
 import os
 from random import randint
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 
 # Zope imports
 from AccessControl import ClassSecurityInfo
@@ -39,20 +41,24 @@ from .TransactionalMixin import TransactionalMixin
 _globals = globals()
 DEFAULT_CONFIG_PATH = os.path.join(package_home(globals()), 'config')
 
-config = getattr(getConfiguration(),'product_config',{}).get('maildrophost', {})
-CONFIG_PATHS = {'DEFAULT' : DEFAULT_CONFIG_PATH}
+config = getattr(getConfiguration(), 'product_config',
+                 {}).get('maildrophost', {})
+CONFIG_PATHS = {'DEFAULT': DEFAULT_CONFIG_PATH}
 for key, value in list(config.items()):
     if key.startswith('config-path'):
         CONFIG_PATHS[key] = value
 
-addMaildropHostForm=DTMLFile('dtml/add', _globals)
+addMaildropHostForm = DTMLFile('dtml/add', _globals)
+
+
 def manage_addMaildropHost(self, id, title='Maildrop Host', REQUEST=None):
     """ add a MaildropHost into the system """
     mh = MaildropHost(id, title)
     self._setObject(id, mh)
 
     if REQUEST is not None:
-        qs = 'manage_tabs_message=%s' % urllib.parse.quote('Added MaildropHost.')
+        qs = 'manage_tabs_message=%s' % urllib.parse.quote(
+            'Added MaildropHost.')
         ret_url = '%s/%s/manage_main?%s' % (self.absolute_url(), id, qs)
         REQUEST['RESPONSE'].redirect(ret_url)
 
@@ -77,15 +83,12 @@ class MaildropHost(MailHost):
     manage_log = DTMLFile('dtml/log', globals())
 
     manage_options = (
-      ( { 'label' : 'Edit', 'action' : 'manage_main'
-        , 'help' : ('MaildropHost', 'edit.stx')
-        }
-      , { 'label' : 'Maildrop Log', 'action' : 'manage_log'
-        , 'help' : ('MaildropHost', 'log.stx')
-        }
-      )
-      + MailHost.manage_options[1:]
-      )
+        ({'label': 'Edit', 'action': 'manage_main', 'help': ('MaildropHost', 'edit.stx')
+          }, {'label': 'Maildrop Log', 'action': 'manage_log', 'help': ('MaildropHost', 'log.stx')
+              }
+         )
+        + MailHost.manage_options[1:]
+    )
 
     def __init__(self, id='', title='Maildrop Host'):
         """ Initialize a new MaildropHost """
@@ -95,12 +98,14 @@ class MaildropHost(MailHost):
         self._load_config()
 
     security.declareProtected(change_configuration, 'getConfigPath')
+
     def getConfigPath(self):
         """ Get the path to the currently active configuration file
         """
         return getattr(aq_base(self), 'config_path', DEFAULT_CONFIG_PATH)
 
     security.declareProtected(change_configuration, 'setConfigPath')
+
     def setConfigPath(self, path_key):
         """ Set the path to the currently active configuration file
         """
@@ -128,12 +133,14 @@ class MaildropHost(MailHost):
         self._load_config()
 
     security.declareProtected(change_configuration, 'addConfigPath')
+
     def addConfigPath(self, path_key, path):
         """ Method to add a config path programmatically
         """
         CONFIG_PATHS[path_key] = path
 
     security.declareProtected(change_configuration, 'getCandidateConfigPaths')
+
     def getCandidateConfigPaths(self):
         """ Retrieve the config paths set in zope.conf
         """
@@ -150,8 +157,8 @@ class MaildropHost(MailHost):
         self.smtp_host = config['SMTP_HOST']
         self.smtp_port = config['SMTP_PORT']
         self.debug = config['DEBUG'] and 'On' or 'Off'
-        self._debug_receiver = config.get('DEBUG_RECEIVER', '') 
-        self.debug_receiver =  self._debug_receiver or '(not set)'
+        self._debug_receiver = config.get('DEBUG_RECEIVER', '')
+        self.debug_receiver = self._debug_receiver or '(not set)'
         self.polling = config['MAILDROP_INTERVAL']
         MAILDROP_HOME = config['MAILDROP_HOME']
         MAILDROP_SPOOL = config.get('MAILDROP_SPOOL', '')
@@ -166,9 +173,9 @@ class MaildropHost(MailHost):
                 os.makedirs(spool)
 
         MAILDROP_TLS = config['MAILDROP_TLS']
-        self.use_tls = ( (MAILDROP_TLS > 1 and 'Forced') or
-                         (MAILDROP_TLS == 1 and 'Yes') or
-                         'No' )
+        self.use_tls = ((MAILDROP_TLS > 1 and 'Forced') or
+                        (MAILDROP_TLS == 1 and 'Yes') or
+                        'No')
         self.login = config['MAILDROP_LOGIN'] or '(not set)'
         self.password = config['MAILDROP_PASSWORD'] and '******' or '(not set)'
         self.add_messageid = config.get('ADD_MESSAGEID', 0) and 'On' or 'Off'
@@ -189,13 +196,9 @@ class MaildropHost(MailHost):
         return _makeTempPath(self.spool)
 
     security.declareProtected(change_configuration, 'manage_makeChanges')
-    def manage_makeChanges( self
-                          , title
-                          , transactional=False
-                          , path_key=None
-                          , REQUEST=None
-                          , **ignored
-                          ):
+
+    def manage_makeChanges(self, title, transactional=False, path_key=None, REQUEST=None, **ignored
+                           ):
         """ Change the MaildropHost properties """
         self.title = title
         self._transactional = not not transactional
@@ -206,12 +209,11 @@ class MaildropHost(MailHost):
             msg = 'MaildropHost "%s" updated' % self.id
             return self.manage_main(manage_tabs_message=msg)
 
-
     security.declareProtected(change_configuration, 'isTransactional')
+
     def isTransactional(self):
         """ Is transactional mode in use? """
         return getattr(self, '_transactional', True)
-
 
     def _send(self, m_from, m_to, body, immediate=False):
         """ Send a mail using the asynchronous maildrop handler """
@@ -225,8 +227,8 @@ class MaildropHost(MailHost):
 
         return email.send()
 
-
     security.declareProtected(change_configuration, 'getLog')
+
     def getLog(self, max_bytes=50000):
         """ Return the maildrop daemon log contents, up to max_bytes bytes.
 
@@ -256,7 +258,6 @@ class Email:
         self._tempfile = temp_path
         self._transactional = False
 
-
     def send(self):
         """ Write myself to the file system """
         temp_path = self._tempfile
@@ -266,8 +267,21 @@ class Email:
         lock.write('locked')
         lock.close()
 
+        def _fmt_bytes_to_str(string):
+            if type(string) == bytes:
+                return string.decode()
+
+            return string
+
         temp = open(temp_path, 'w')
-        temp.write(MAIL_TEMPLATE % (self.m_to, self.m_from, self.body))
+
+        string = MAIL_TEMPLATE % (
+            _fmt_bytes_to_str(self.m_to),
+            _fmt_bytes_to_str(self.m_from),
+            _fmt_bytes_to_str(self.body)
+        )
+
+        temp.write(string)
         temp.close()
 
         if not self._transactional:
@@ -298,5 +312,4 @@ MAIL_TEMPLATE = """##To:%s
 """
 
 
-InitializeClass(MaildropHost) 
-
+InitializeClass(MaildropHost)
